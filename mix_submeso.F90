@@ -960,23 +960,11 @@
               GTK(i,j,n) = c0
               
 
-            enddo
-          enddo
-
-       end do
-
-      do n = 1,nt
-
 !-----------------------------------------------------------------------
 !
 !     calculate vertical submesoscale fluxes thru horizontal faces of T-cell
 !
 !-----------------------------------------------------------------------
- 
-
-
-        do j=1,ny_block
-            do i=1,nx_block
              
               if (j>=this_block%jb .and. j<= this_block%je .and. i>=this_block%ib .and. i<=this_block%ie) then 
                 if ( k < km ) then
