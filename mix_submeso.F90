@@ -975,10 +975,11 @@
  
 
 
-        do j=this_block%jb,this_block%je
-            do i=this_block%ib,this_block%ie
-              
-               if ( k < km ) then
+        do j=1,ny_block
+            do i=1,nx_block
+             
+              if (j>=this_block%jb .and. j<= this_block%je .and. i>=this_block%ib .and. i<=this_block%ie) then 
+                if ( k < km ) then
 
                   WORK1(i,j) = SF_SUBM_X(i  ,j  ,ieast ,kbt,k  ,bid)     &
                              * HYX(i  ,j  ,bid) * TX(i  ,j  ,k  ,n,bid)  &
@@ -1010,6 +1011,7 @@
 
                   FZTOP_SUBM(i,j,n,bid) = fz
 
+
                else  
 
 
@@ -1020,6 +1022,7 @@
                    FZTOP_SUBM(i,j,n,bid) = c0
               
                endif   
+              endif
 
             enddo
           enddo
