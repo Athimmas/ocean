@@ -974,11 +974,12 @@
 !-----------------------------------------------------------------------
  
 
-        if ( k < km ) then
 
-              do j=this_block%jb,this_block%je
-                do i=this_block%ib,this_block%ie
-               
+        do j=this_block%jb,this_block%je
+            do i=this_block%ib,this_block%ie
+              
+               if ( k < km ) then
+
                   WORK1(i,j) = SF_SUBM_X(i  ,j  ,ieast ,kbt,k  ,bid)     &
                              * HYX(i  ,j  ,bid) * TX(i  ,j  ,k  ,n,bid)  &
                              + SF_SUBM_Y(i  ,j  ,jnorth,kbt,k  ,bid)     &
@@ -1000,34 +1001,29 @@
                              * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1,n,bid) ) 
     
 
-                fz = -KMASK(i,j) * p25                                &
-                     * (WORK1(i,j) + WORK2(i,j))
+                  fz = -KMASK(i,j) * p25                                &
+                      * (WORK1(i,j) + WORK2(i,j))
 
-                GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
-                             + FY(i,j,n) - FY(i,j-1,n)  &
-                      + FZTOP_SUBM(i,j,n,bid) - fz )*dzr(k)*TAREA_R(i,j,bid)
+                  GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
+                               + FY(i,j,n) - FY(i,j-1,n)  &
+                        + FZTOP_SUBM(i,j,n,bid) - fz )*dzr(k)*TAREA_R(i,j,bid)
 
-                FZTOP_SUBM(i,j,n,bid) = fz
+                  FZTOP_SUBM(i,j,n,bid) = fz
 
-              enddo
-          enddo
+               else  
 
 
-         else                 ! k = km
+                  GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
+                               + FY(i,j,n) - FY(i,j-1,n)  &
+                     + FZTOP_SUBM(i,j,n,bid) )*dzr(k)*TAREA_R(i,j,bid)
 
-          do j=this_block%jb,this_block%je
-            do i=this_block%ib,this_block%ie
-
-              GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
-                           + FY(i,j,n) - FY(i,j-1,n)  &
-                    + FZTOP_SUBM(i,j,n,bid) )*dzr(k)*TAREA_R(i,j,bid)
-
-              FZTOP_SUBM(i,j,n,bid) = c0 
+                   FZTOP_SUBM(i,j,n,bid) = c0
+              
+               endif   
 
             enddo
           enddo
 
-        endif
 
 !-----------------------------------------------------------------------
 !
