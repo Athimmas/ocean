@@ -919,17 +919,6 @@
         factor    = c0
       endif
      
-      if( k==1 ) then
-        do kk =1,km
-         do n = 3,nt
-           if (.not. reg_match_init_gm .and.  kk < km ) then
-               TZ(:,:,kk+1,n,bid) = TMIX(:,:,kk,n) - TMIX(:,:,kk+1,n)
-           endif 
-         enddo
-        enddo
-
-      endif
- 
  
       do n = 1,nt
           do j=1,ny_block
@@ -960,14 +949,25 @@
               GTK(i,j,n) = c0
               
 
+            enddo
+          enddo
+
+       end do
+
+      do n = 1,nt
+
 !-----------------------------------------------------------------------
 !
 !     calculate vertical submesoscale fluxes thru horizontal faces of T-cell
 !
 !-----------------------------------------------------------------------
-             
-              if (j>=this_block%jb .and. j<= this_block%je .and. i>=this_block%ib .and. i<=this_block%ie) then 
-                if ( k < km ) then
+ 
+
+
+        do j=this_block%jb,this_block%je
+            do i=this_block%ib,this_block%ie
+              
+               if ( k < km ) then
 
                   WORK1(i,j) = SF_SUBM_X(i  ,j  ,ieast ,kbt,k  ,bid)     &
                              * HYX(i  ,j  ,bid) * TX(i  ,j  ,k  ,n,bid)  &
@@ -999,7 +999,6 @@
 
                   FZTOP_SUBM(i,j,n,bid) = fz
 
-
                else  
 
 
@@ -1010,7 +1009,6 @@
                    FZTOP_SUBM(i,j,n,bid) = c0
               
                endif   
-              endif
 
             enddo
           enddo

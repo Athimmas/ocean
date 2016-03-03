@@ -497,6 +497,16 @@
 
         enddo   ! end of kk-loop
 
+        !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk,n)num_threads(60)
+        do kk =1,km
+         do n = 3,nt
+           if ( kk < km ) then
+               TZ(:,:,kk+1,n,bid) = TMIX(:,:,kk,n) - TMIX(:,:,kk+1,n)
+           endif
+         enddo
+        enddo
+
+
         !end_time = omp_get_wtime()
 
         !print *,"Time taken at second time",end_time - start_time
