@@ -895,7 +895,7 @@
 
       logical :: reg_match_init_gm
 
-      real (r8) tzn,tznkp1,tzip1,tzjp1,tzip1k1,tzjp1k1
+      real (r8) WORK1prev,WORK2prev,KMASKprev,fzprev
 
      reg_match_init_gm = registry_match('init_gm')  
 
@@ -988,10 +988,43 @@
                              * HYX(i-1,j  ,bid) * TX(i-1,j  ,kp1,n,bid)  &
                              + SF_SUBM_Y(i  ,j  ,jsouth,ktp,kp1,bid)     &
                              * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1,n,bid) ) 
+ 
     
+                  WORK1prev = SF_SUBM_X(i  ,j  ,ieast ,kbt,k-1 ,bid)     &
+                             * HYX(i  ,j  ,bid) * TX(i  ,j  ,k-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jnorth,kbt,k-1,bid)     &
+                             * HXY(i  ,j  ,bid) * TY(i  ,j  ,k-1,n,bid)  &
+                             + SF_SUBM_X(i  ,j  ,iwest ,kbt,k-1,bid)     &
+                             * HYX(i-1,j  ,bid) * TX(i-1,j  ,k-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jsouth,kbt,k-1,bid)     &
+                             * HXY(i  ,j-1,bid) * TY(i  ,j-1,k-1,n,bid)
 
-                  fz = -KMASK(i,j) * p25                                &
+                  WORK2prev = factor &
+                           * ( SF_SUBM_X(i  ,j  ,ieast ,ktp,kp1-1,bid)     &
+                             * HYX(i  ,j  ,bid) * TX(i  ,j  ,kp1-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jnorth,ktp,kp1-1,bid)     &
+                             * HXY(i  ,j  ,bid) * TY(i  ,j  ,kp1-1,n,bid)  &
+                             + SF_SUBM_X(i  ,j  ,iwest ,ktp,kp1-1,bid)     &
+                             * HYX(i-1,j  ,bid) * TX(i-1,j  ,kp1-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jsouth,ktp,kp1-1,bid)     &
+                             * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1-1,n,bid) )
+
+                  KMASKprev = merge(c1, c0, k-1 < KMT(i,j,bid))
+
+
+                  fzprev = -KMASKprev * p25 &
+                            * (WORK1prev + WORK2prev)
+
+                  if(fzprev /= FZTOP_SUBM(i,j,n,bid)) then 
+                     print *,"wrong value OH NO",k
+                  else
+                     print *,"its okay Yeah",k
+                  endif   
+
+                  fz = -KMASK(i,j) * p25    &
                       * (WORK1(i,j) + WORK2(i,j))
+
+
 
                   GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
                                + FY(i,j,n) - FY(i,j-1,n)  &
