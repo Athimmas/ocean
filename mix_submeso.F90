@@ -895,7 +895,7 @@
 
       logical :: reg_match_init_gm
 
-      real (r8) WORK1prev,WORK2prev,KMASKprev,fzprev
+      real (r8) :: WORK1prev,WORK2prev,KMASKprev,fzprev,GTKmy
 
      reg_match_init_gm = registry_match('init_gm')  
 
@@ -988,7 +988,13 @@
                              * HYX(i-1,j  ,bid) * TX(i-1,j  ,kp1,n,bid)  &
                              + SF_SUBM_Y(i  ,j  ,jsouth,ktp,kp1,bid)     &
                              * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1,n,bid) ) 
+                   
+                  if(k==1) then
  
+                  fzprev = 0
+    
+                  else    
+
     
                   WORK1prev = SF_SUBM_X(i  ,j  ,ieast ,kbt,k-1 ,bid)     &
                              * HYX(i  ,j  ,bid) * TX(i  ,j  ,k-1,n,bid)  &
@@ -1015,29 +1021,54 @@
                   fzprev = -KMASKprev * p25 &
                             * (WORK1prev + WORK2prev)
 
-                  if(fzprev /= FZTOP_SUBM(i,j,n,bid)) then 
-                     print *,"wrong value OH NO",k
-                  else
-                     print *,"its okay Yeah",k
-                  endif   
+                  endif 
+
+                  !if(fzprev /= FZTOP_SUBM(i,j,n,bid)) then 
+                  !   print *,"wrong value OH NO",k
+                  !else
+                  !   print *,"its okay Yeah",k
+                  !endif    
 
                   fz = -KMASK(i,j) * p25    &
                       * (WORK1(i,j) + WORK2(i,j))
 
 
-
                   GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
                                + FY(i,j,n) - FY(i,j-1,n)  &
-                        + FZTOP_SUBM(i,j,n,bid) - fz )*dzr(k)*TAREA_R(i,j,bid)
+                        + fzprev - fz )*dzr(k)*TAREA_R(i,j,bid)
 
                   FZTOP_SUBM(i,j,n,bid) = fz
 
                else  
 
+                  WORK1prev = SF_SUBM_X(i  ,j  ,ieast ,kbt,k-1 ,bid)     &
+                             * HYX(i  ,j  ,bid) * TX(i  ,j  ,k-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jnorth,kbt,k-1,bid)     &
+                             * HXY(i  ,j  ,bid) * TY(i  ,j  ,k-1,n,bid)  &
+                             + SF_SUBM_X(i  ,j  ,iwest ,kbt,k-1,bid)     &
+                             * HYX(i-1,j  ,bid) * TX(i-1,j  ,k-1,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jsouth,kbt,k-1,bid)     &
+                             * HXY(i  ,j-1,bid) * TY(i  ,j-1,k-1,n,bid)
+
+                  WORK2prev = factor &
+                           * ( SF_SUBM_X(i  ,j  ,ieast ,ktp,km,bid)     &
+                             * HYX(i  ,j  ,bid) * TX(i  ,j  ,km,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jnorth,ktp,km,bid)     &
+                             * HXY(i  ,j  ,bid) * TY(i  ,j  ,km,n,bid)  &
+                             + SF_SUBM_X(i  ,j  ,iwest ,ktp,km,bid)     &
+                             * HYX(i-1,j  ,bid) * TX(i-1,j  ,km,n,bid)  &
+                             + SF_SUBM_Y(i  ,j  ,jsouth,ktp,km,bid)     &
+                             * HXY(i  ,j-1,bid) * TY(i  ,j-1,km,n,bid) )
+
+                  KMASKprev = merge(c1, c0, k-1 < KMT(i,j,bid))
+
+
+                  fzprev = -KMASKprev * p25 &
+                            * (WORK1prev + WORK2prev)
 
                   GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
                                + FY(i,j,n) - FY(i,j-1,n)  &
-                     + FZTOP_SUBM(i,j,n,bid) )*dzr(k)*TAREA_R(i,j,bid)
+                     + fzprev )*dzr(k)*TAREA_R(i,j,bid)
 
                    FZTOP_SUBM(i,j,n,bid) = c0
               
@@ -1060,7 +1091,7 @@
               WORK1(i,j) = FX(i,j,n)*dzr(k)*TAREA_R(i,j,bid)
             enddo
             enddo
-            call accumulate_tavg_field(WORK1,tavg_HDIFE_TRACER(n),bid,k)
+            !call accumulate_tavg_field(WORK1,tavg_HDIFE_TRACER(n),bid,k)
           endif
 
           if (accumulate_tavg_now(tavg_HDIFN_TRACER(n))) then
@@ -1069,7 +1100,7 @@
               WORK1(i,j) = FY(i,j,n)*dzr(k)*TAREA_R(i,j,bid)
             enddo
             enddo
-            call accumulate_tavg_field(WORK1,tavg_HDIFN_TRACER(n),bid,k)
+            !call accumulate_tavg_field(WORK1,tavg_HDIFN_TRACER(n),bid,k)
           endif
 
           if (accumulate_tavg_now(tavg_HDIFB_TRACER(n))) then
@@ -1078,7 +1109,7 @@
               WORK1(i,j) = FZTOP_SUBM(i,j,n,bid)*dzr(k)*TAREA_R(i,j,bid)
             enddo
             enddo
-            call accumulate_tavg_field(WORK1,tavg_HDIFB_TRACER(n),bid,k)
+            !call accumulate_tavg_field(WORK1,tavg_HDIFB_TRACER(n),bid,k)
           endif
       endif   ! mix_pass ne 1  
 
