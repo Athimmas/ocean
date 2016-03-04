@@ -558,21 +558,27 @@
          !end_time = omp_get_wtime()
          !print *,"time at submeso_sf is ",end_time - start_time
         endif
+
+        start_time = omp_get_wtime()
         if(k==1)then
-          start_time = omp_get_wtime() 
-          !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)
+          !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)num_threads(16)schedule(dynamic,1)
           do kk=1,km 
               call submeso_flux(kk, TDTK(:,:,:,kk), TMIX, tavg_HDIFE_TRACER, &
                            tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
-          enddo
-          end_time = omp_get_wtime() 
+          enddo 
         endif
+        end_time = omp_get_wtime()
         print *,"time at submeso_flux is ",end_time - start_time
         HDTK=HDTK+TDTK(:,:,:,k)
        call timer_stop(timer_submeso, block_id=this_block%local_id)
    endif
    
-  
+       if(my_task == master_task) then
+       open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
+       write(10),TDTK(:,:,:,k)
+       close(10)
+       endif
+
    
    
 !-----------------------------------------------------------------------

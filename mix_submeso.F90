@@ -901,7 +901,7 @@
 
      bid = this_block%local_id
 
-     if ( k == 1) FZTOP_SUBM(:,:,:,bid) = c0        ! zero flux B.C. at the surface
+     !if ( k == 1) FZTOP_SUBM(:,:,:,bid) = c0        ! zero flux B.C. at the surface
      
       CX = merge(HYX(:,:,bid)*p25, c0, (k <= KMT (:,:,bid))   &
                                  .and. (k <= KMTE(:,:,bid)))
@@ -1037,7 +1037,7 @@
                                + FY(i,j,n) - FY(i,j-1,n)  &
                         + fzprev - fz )*dzr(k)*TAREA_R(i,j,bid)
 
-                  FZTOP_SUBM(i,j,n,bid) = fz
+                  !FZTOP_SUBM(i,j,n,bid) = fz
 
                else  
 
@@ -1070,7 +1070,7 @@
                                + FY(i,j,n) - FY(i,j-1,n)  &
                      + fzprev )*dzr(k)*TAREA_R(i,j,bid)
 
-                   FZTOP_SUBM(i,j,n,bid) = c0
+                   !FZTOP_SUBM(i,j,n,bid) = c0
               
                endif   
 
@@ -1121,12 +1121,11 @@
 
       enddo !ends the do n loop 
 
-      if(my_task == master_task) then
-      open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
-       write(10),GTK
-       close(10)
-
-      endif
+      !if(my_task == master_task) then
+      !open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
+      !write(10),GTK
+      !close(10)
+      !endif
 !-----------------------------------------------------------------------
 
    end subroutine submeso_flux 
