@@ -1121,6 +1121,7 @@
 
       enddo !ends the do n loop 
 
+
       !if(my_task == master_task) then
       !open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
       !write(10),GTK

@@ -1192,7 +1192,7 @@
          bid                 ! local block address for this sub block
 
       real (r8) :: &
-         fz, dz_bottom, factor
+         fz, dz_bottom, factor, fzprev, KMASKprev, WORK3prev, dzbottomprev
 
       real (r8), dimension(nx_block,ny_block) :: &
          CX, CY,                  &
@@ -2082,11 +2082,6 @@
                       + SLY(i,j,jsouth,kbt,k  ,bid)                   &
                        * HXY(i  ,j-1,bid) * TY(i  ,j-1,k  ,n,bid) ) )
 
-               enddo
-             enddo
-
-            do j=this_block%jb,this_block%je
-              do i=this_block%ib,this_block%ie
 
                 WORK3(i,j) = WORK3(i,j)                               &
                     + ( SF_SLX(i  ,j  ,ieast ,kbt,k  ,bid)            &
@@ -2098,11 +2093,6 @@
                       + SF_SLY(i  ,j  ,jsouth,kbt,k  ,bid)            &
                        * HXY(i  ,j-1,bid) * TY(i  ,j-1,k  ,n,bid) )
 
-               enddo
-             enddo
-
-            do j=this_block%jb,this_block%je
-              do i=this_block%ib,this_block%ie
 
                 WORK3(i,j) = WORK3(i,j)                               &
                     + ( dz_bottom * KAPPA_ISOP(i,j,ktp,kp1,bid)       &
@@ -2115,11 +2105,6 @@
                       + SLY(i  ,j  ,jsouth,ktp,kp1,bid)               &
                        * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1,n,bid) ) )
 
-               enddo
-             enddo
-
-            do j=this_block%jb,this_block%je
-              do i=this_block%ib,this_block%ie
 
                  WORK3(i,j) = WORK3(i,j)                              &
                     + ( factor                                        &
@@ -2131,18 +2116,83 @@
                        * HYX(i-1,j  ,bid) * TX(i-1,j  ,kp1,n,bid)     &
                       + SF_SLY(i  ,j  ,jsouth,ktp,kp1,bid)            &
                        * HXY(i  ,j-1,bid) * TY(i  ,j-1,kp1,n,bid) ) )
+             
 
-               enddo
-             enddo
+              !-------------------------------------------------------!  
 
-            do j=this_block%jb,this_block%je
-              do i=this_block%ib,this_block%ie
+               if(k ==1) then
+                 
+                 fzprev = c0  
+                 dzbottomprev = dz(k)
+
+               else
+ 
+                WORK3prev = c0 
+                dzbottomprev = dz(k)    
+
+                WORK3prev = WORK3prev                                 &
+                    + ( dz(k-1) * KAPPA_ISOP(i,j,kbt,k-1,bid)         &
+                    * ( SLX(i,j,ieast ,kbt,k-1 ,bid)                  &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,k-1,n,bid)     &
+                      + SLY(i,j,jnorth,kbt,k-1,bid)                   &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,k-1,n,bid)     &
+                      + SLX(i,j,iwest ,kbt,k-1,bid)                   &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,k-1,n,bid)     &
+                      + SLY(i,j,jsouth,kbt,k-1,bid)                   &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,k-1,n,bid) ) )
+
+
+                WORK3prev = WORK3prev                                 &
+                    + ( SF_SLX(i  ,j  ,ieast ,kbt,k-1,bid)            &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,k-1,n,bid)     &
+                      + SF_SLY(i  ,j  ,jnorth,kbt,k-1,bid)            &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,k-1,n,bid)     &
+                      + SF_SLX(i  ,j  ,iwest ,kbt,k-1,bid)            &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,k-1,n,bid)     &
+                      + SF_SLY(i  ,j  ,jsouth,kbt,k-1,bid)            &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,k-1,n,bid) )
+
+
+
+                WORK3prev = WORK3prev                           &
+                    + ( dzbottomprev * KAPPA_ISOP(i,j,ktp,k,bid)    &
+                    * ( SLX(i  ,j  ,ieast ,ktp,k,bid)               &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,k,n,bid)     &
+                      + SLY(i  ,j  ,jnorth,ktp,k,bid)               &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,k,n,bid)     &
+                      + SLX(i  ,j  ,iwest ,ktp,k,bid)               &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,k,n,bid)     &
+                      + SLY(i  ,j  ,jsouth,ktp,k,bid)               &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,k,n,bid) ) )
+
+
+                 WORK3prev = WORK3prev                          &
+                    + ( c1                                            &
+                    * ( SF_SLX(i  ,j  ,ieast ,ktp,k  ,bid)            &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,k  ,n,bid)     &
+                      + SF_SLY(i  ,j  ,jnorth,ktp,k  ,bid)            &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,k  ,n,bid)     &
+                      + SF_SLX(i  ,j  ,iwest ,ktp,k  ,bid)            &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,k  ,n,bid)     &
+                      + SF_SLY(i  ,j  ,jsouth,ktp,k  ,bid)            &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,k,n,bid) ) )
+
+                 KMASKprev = merge(c1, c0, k-1 < KMT(i,j,bid))
+
+                 fzprev = -KMASKprev * p25 * WORK3prev 
+
+                !-------------------------------------------------------! 
+             
+                endif 
+
+
+                !if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,"wrong",k
 
                 fz = -KMASK(i,j) * p25 * WORK3(i,j)
 
                 GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
                              + FY(i,j,n) - FY(i,j-1,n)  &
-                      + FZTOP(i,j,n,bid) - fz )*dzr(k)*TAREA_R(i,j,bid)
+                      + fzprev - fz )*dzr(k)*TAREA_R(i,j,bid)
 
                 FZTOP(i,j,n,bid) = fz
 
@@ -2204,15 +2254,74 @@
           endif
 
         else                 ! k = km
+ 
+          dzbottomprev = dz(k)    
+
 
           do j=this_block%jb,this_block%je
             do i=this_block%ib,this_block%ie
 
-              GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
-                           + FY(i,j,n) - FY(i,j-1,n)  &
-                    + FZTOP(i,j,n,bid) )*dzr(k)*TAREA_R(i,j,bid)
+                WORK3prev = c0
 
-              FZTOP(i,j,n,bid) = c0 
+                WORK3prev = WORK3prev                                 &
+                   + ( dz(km-1) * KAPPA_ISOP(i,j,kbt,km-1,bid)         &
+                    * ( SLX(i,j,ieast ,kbt,km-1 ,bid)                  &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,km-1,n,bid)     &
+                      + SLY(i,j,jnorth,kbt,km-1,bid)                   &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,km-1,n,bid)     &
+                      + SLX(i,j,iwest ,kbt,km-1,bid)                   &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,km-1,n,bid)     &
+                      + SLY(i,j,jsouth,kbt,km-1,bid)                   &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,km-1,n,bid) ) )
+    
+
+                WORK3prev = WORK3prev                                 &
+                    + ( SF_SLX(i  ,j  ,ieast ,kbt,km-1,bid)            &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,km-1,n,bid)     &
+                      + SF_SLY(i  ,j  ,jnorth,kbt,km-1,bid)            &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,km-1,n,bid)     &
+                      + SF_SLX(i  ,j  ,iwest ,kbt,km-1,bid)            &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,km-1,n,bid)     &
+                      + SF_SLY(i  ,j  ,jsouth,kbt,km-1,bid)            &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,km-1,n,bid) )
+
+
+                WORK3prev = WORK3prev                           &
+                    + ( dzbottomprev * KAPPA_ISOP(i,j,ktp,km,bid)    &
+                    * ( SLX(i  ,j  ,ieast ,ktp,km,bid)               &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,km,n,bid)     &
+                      + SLY(i  ,j  ,jnorth,ktp,km,bid)               &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,km,n,bid)     &
+                      + SLX(i  ,j  ,iwest ,ktp,km,bid)               &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,km,n,bid)     &
+                      + SLY(i  ,j  ,jsouth,ktp,km,bid)               &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,km,n,bid) ) )
+
+
+                 WORK3prev = WORK3prev                          &
+                    + ( c1                                             &
+                    * ( SF_SLX(i  ,j  ,ieast ,ktp,km  ,bid)            &
+                       * HYX(i  ,j  ,bid) * TX(i  ,j  ,km  ,n,bid)     &
+                      + SF_SLY(i  ,j  ,jnorth,ktp,km  ,bid)            &
+                       * HXY(i  ,j  ,bid) * TY(i  ,j  ,km  ,n,bid)     &
+                      + SF_SLX(i  ,j  ,iwest ,ktp,km  ,bid)            &
+                       * HYX(i-1,j  ,bid) * TX(i-1,j  ,km  ,n,bid)     &
+                      + SF_SLY(i  ,j  ,jsouth,ktp,km  ,bid)            &
+                       * HXY(i  ,j-1,bid) * TY(i  ,j-1,km,n,bid) ) )
+
+
+                 KMASKprev = merge(c1, c0, km-1 < KMT(i,j,bid))        
+
+                 fzprev = -KMASKprev * p25 * WORK3prev
+ 
+                 !if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task .and. i == 63 .and. j==42 .and. n==1 ) print *,fzprev,FZTOP(i,j,n,bid)
+
+
+                 GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
+                              + FY(i,j,n) - FY(i,j-1,n)  &
+                        + fzprev )*dzr(k)*TAREA_R(i,j,bid)
+
+                 FZTOP(i,j,n,bid) = c0 
 
             enddo
           enddo
@@ -2226,7 +2335,6 @@
 !-----------------------------------------------------------------------
 
       enddo
-
 
 !-----------------------------------------------------------------------
 !

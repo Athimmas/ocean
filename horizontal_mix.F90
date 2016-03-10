@@ -25,7 +25,7 @@
    use domain, only: nblocks_clinic, distrb_clinic
    use constants, only: c0, blank_fmt, delim_fmt, ndelim_fmt
    use communicate, only: my_task, master_task
-   use time_management, only: km, nt, mix_pass
+   use time_management, only: km, nt, mix_pass,nsteps_run
    use broadcast, only: broadcast_scalar
    use grid, only: KMT, dz, partial_bottom_cells, DZT, dzr, dzwr
    use io_types, only: nml_in, nml_filename, stdout
@@ -507,7 +507,6 @@
    real (POP_r8) :: &
       start_time,end_time ! Timers
 
-
 !-----------------------------------------------------------------------
 !
 !  branch to the proper mix routine
@@ -533,10 +532,19 @@
         !print *,"time at tracer_diffs 1 is ",end_time - start_time   
       endif
        !start_time = omp_get_wtime() 
+
       call hdifft_gm(k, HDTK, TMIX, UMIX, VMIX, tavg_HDIFE_TRACER, &
                      tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
+
        !end_time = omp_get_wtime() 
        !print *,"time at hdifft_gm is ",end_time - start_time
+   
+      if(my_task == master_task) then
+      open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
+       write(10),HDTK
+       close(10)
+      endif 
+  
    end select
    
    call timer_stop(timer_hdifft, block_id=bid)
@@ -559,25 +567,25 @@
          !print *,"time at submeso_sf is ",end_time - start_time
         endif
 
-        start_time = omp_get_wtime()
+        !start_time = omp_get_wtime()
         if(k==1)then
-          !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)num_threads(16)schedule(dynamic,1)
+          !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)num_threads(16)schedule(dynamic,1)
           do kk=1,km 
               call submeso_flux(kk, TDTK(:,:,:,kk), TMIX, tavg_HDIFE_TRACER, &
                            tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
           enddo 
         endif
-        end_time = omp_get_wtime()
-        print *,"time at submeso_flux is ",end_time - start_time
+        !end_time = omp_get_wtime()
+        !print *,"time at submeso_flux is ",end_time - start_time
         HDTK=HDTK+TDTK(:,:,:,k)
        call timer_stop(timer_submeso, block_id=this_block%local_id)
    endif
    
-       if(my_task == master_task) then
-       open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
-       write(10),TDTK(:,:,:,k)
-       close(10)
-       endif
+       !if(my_task == master_task) then
+       !open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
+       !write(10),TDTK(:,:,:,k)
+       !close(10)
+       !endif
 
    
    
