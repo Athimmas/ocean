@@ -503,7 +503,7 @@
    real (POP_r8), dimension(nx_block,ny_block) :: &
      WORK                 ! temporary to hold tavg field
    real (POP_r8), dimension(nx_block,ny_block,nt,km) :: &
-      TDTK                ! Hdiff(T) for nth tracer at level k from submeso_flux code
+      TDTK,HDTK_BUF       ! Hdiff(T) for nth tracer at level k from submeso_flux code
    real (POP_r8) :: &
       start_time,end_time ! Timers
 
@@ -532,18 +532,30 @@
         !print *,"time at tracer_diffs 1 is ",end_time - start_time   
       endif
        !start_time = omp_get_wtime() 
+ 
+      if(k==1) then   
 
-      call hdifft_gm(k, HDTK, TMIX, UMIX, VMIX, tavg_HDIFE_TRACER, &
-                     tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
+         call hdifft_gm(1,HDTK_BUF(:,:,:,1) , TMIX, UMIX, VMIX, tavg_HDIFE_TRACER, &
+                                 tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
+
+         do kk=2,km
+         call hdifft_gm(kk,HDTK_BUF(:,:,:,kk) , TMIX, UMIX, VMIX,tavg_HDIFE_TRACER, &
+                                 tavg_HDIFN_TRACER, tavg_HDIFB_TRACER,this_block)             
+         enddo
+
+      endif
 
        !end_time = omp_get_wtime() 
        !print *,"time at hdifft_gm is ",end_time - start_time
    
+
       if(my_task == master_task) then
       open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
-       write(10),HDTK
+       write(10),HDTK_BUF(:,:,:,k)
        close(10)
       endif 
+
+      HDTK = HDTK_BUF(:,:,:,k)  
   
    end select
    

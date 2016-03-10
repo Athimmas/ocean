@@ -2186,7 +2186,7 @@
                 endif 
 
 
-                !if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,"wrong",k
+                if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,"wrong",k
 
                 fz = -KMASK(i,j) * p25 * WORK3(i,j)
 
@@ -2314,7 +2314,7 @@
 
                  fzprev = -KMASKprev * p25 * WORK3prev
  
-                 !if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task .and. i == 63 .and. j==42 .and. n==1 ) print *,fzprev,FZTOP(i,j,n,bid)
+                 if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,fzprev,FZTOP(i,j,n,bid)
 
 
                  GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
