@@ -1278,8 +1278,8 @@
 
           !start_time = omp_get_wtime()
 
-         !$OMP PARALLEL DO &
-         !$OMP DEFAULT(SHARED)PRIVATE(kid,i,j,kk_sub,kk)NUM_THREADS(16)COLLAPSE(3) 
+         !!$OMP PARALLEL DO &
+         !!$OMP DEFAULT(SHARED)PRIVATE(kid,i,j,kk_sub,kk)NUM_THREADS(16)COLLAPSE(3) 
           do kk=1,km
             do kk_sub = ktp,kbt
                   do j=1,ny_block
@@ -1419,7 +1419,7 @@
             enddo
           enddo
         else
-          !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk_sub,kk,j,i)NUM_THREADS(16)
+          !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk_sub,kk,j,i)NUM_THREADS(16)
           do kk_sub=ktp,kbt
             do kk=1,km
                do j=1,ny_block
@@ -1445,7 +1445,7 @@
                   kappa_thic_type == kappa_type_bfreq ) then
 
           !start_time = omp_get_wtime()
-          !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk_sub,kk,j,i)NUM_THREADS(16)collapse(3)schedule(dynamic,4)      
+          !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk_sub,kk,j,i)NUM_THREADS(16)collapse(3)schedule(dynamic,4)      
            do kk_sub=ktp,kbt
             do kk=1,km
              do j=1,ny_block
@@ -1456,7 +1456,7 @@
              enddo
             enddo
           enddo
-          !$OMP END PARALLEL DO
+          !!$OMP END PARALLEL DO
           !end_time = omp_get_wtime()
           !print *,"Loop time at kappa_thic_type == kappa_type_const else if is ",end_time - start_time
         else if ( kappa_thic_type == kappa_type_eg ) then
@@ -1510,7 +1510,7 @@
 !
 !-----------------------------------------------------------------------
 
-             !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i,dzw,dz_bottom,zt)NUM_THREADS(16)
+             !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i,dzw,dz_bottom,zt)NUM_THREADS(16)
              do j=1,ny_block
                    do i=1,nx_block
 
@@ -2185,9 +2185,6 @@
              
                 endif 
 
-
-                if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,"wrong",k
-
                 fz = -KMASK(i,j) * p25 * WORK3(i,j)
 
                 GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
@@ -2314,8 +2311,6 @@
 
                  fzprev = -KMASKprev * p25 * WORK3prev
  
-                 if( fzprev /= FZTOP(i,j,n,bid) .and. my_task == master_task ) print *,fzprev,FZTOP(i,j,n,bid)
-
 
                  GTK(i,j,n) = ( FX(i,j,n) - FX(i-1,j,n)  &
                               + FY(i,j,n) - FY(i,j-1,n)  &
@@ -3641,7 +3636,7 @@
       
       do k=1,km
 
-              !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16) 
+              !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16) 
               do j=1,ny_block
                    do i=1,nx_block
 
@@ -3694,7 +3689,7 @@
 !
 !-----------------------------------------------------------------------
 
-             !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
+             !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
              do j=1,ny_block
                    do i=1,nx_block
 
@@ -3711,7 +3706,7 @@
 
              do k=1,km-1
 
-             !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
+             !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
              do j=1,ny_block
                    do i=1,nx_block
 
@@ -3766,7 +3761,7 @@
 
         do kk=ktp,kbt
 
-              !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)SCHEDULE(DYNAMIC,16)
+              !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)SCHEDULE(DYNAMIC,16)
               do j=1,ny_block
                    do i=1,nx_block
                       if (kk == ktp) then
@@ -3847,7 +3842,7 @@
 
       do k=1,km
 
-             !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
+             !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
              do j=1,ny_block
                    do i=1,nx_block
 
@@ -3869,7 +3864,7 @@
               enddo
       enddo
 
-             !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
+             !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i)NUM_THREADS(16)
              do j=1,ny_block
                    do i=1,nx_block
 
@@ -3974,7 +3969,7 @@
       !start_time = omp_get_wtime() 
       bid = this_block%local_id
 
-     !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(k,kk,temp,j,i)num_threads(16)collapse(4)
+     !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(k,kk,temp,j,i)NUM_THREADS(16)collapse(4)
      do k=1,km
         do kk=1,2
            do temp=1,2 
@@ -4029,9 +4024,9 @@
 
         do kk=1,2
  
-          !$OMP PARALLEL PRIVATE(I)DEFAULT(SHARED)num_threads(16)
+          !!$OMP PARALLEL PRIVATE(I)DEFAULT(SHARED)num_threads(16)
  
-          !$omp do  
+          !!$omp do  
           do j=1,ny_block
            do i=1,nx_block
  
@@ -4128,9 +4123,9 @@
 
              enddo
           enddo
-          !$omp end do nowait 
+          !!$omp end do nowait 
 
-          !$OMP END PARALLEL
+          !!$OMP END PARALLEL
         enddo
 
       enddo
@@ -4183,7 +4178,7 @@
 !-----------------------------------------------------------------------
 
       !start_time = omp_get_wtime()
-      !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(i,j,k,kk,reference_depth)num_threads(16)SCHEDULE(DYNAMIC,6) 
+      !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(i,j,k,kk,reference_depth)num_threads(16)SCHEDULE(DYNAMIC,6) 
       do k=1,km
 
         reference_depth(ktp) = zt(k) - p25 * dz(k)
@@ -4360,7 +4355,7 @@
 !     start of tapering
 !
 !-----------------------------------------------------------------------
-      !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(i,j,k,kk,reference_depth)num_threads(16)
+      !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(i,j,k,kk,reference_depth)num_threads(16)
       do k=1,km
 
         reference_depth(ktp) = zt(k) - p25 * dz(k)
