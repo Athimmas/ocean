@@ -1298,7 +1298,7 @@
                   enddo         
             enddo
           enddo
-          !$OMP END PARALLEL DO
+          !!$OMP END PARALLEL DO
 
           !end_time = omp_get_wtime()
 

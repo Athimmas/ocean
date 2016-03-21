@@ -582,11 +582,21 @@
                                this_block, SMF=SMF(:,:,:,iblock))
          endif
 
+      enddo
+   enddo  
+   !$OMP END PARALLEL DO
 !-----------------------------------------------------------------------
 !
 !        calculate level k tracers at new time
 !
 !-----------------------------------------------------------------------
+
+   !$OMP PARALLEL DO PRIVATE(iblock,this_block,k,kp1,km1,WTK,WORK1,factor)
+
+   do iblock = 1,nblocks_clinic
+      this_block = get_block(blocks_clinic(iblock),iblock)
+
+      do k = 1,km
 
 
          call tracer_update(k, WTK,                             &
@@ -607,7 +617,9 @@
                                PSURF  (:,:    ,curtime,iblock), &
                                this_block)
          
-
+      enddo
+   enddo
+   !$OMP END PARALLEL DO
 
 !-----------------------------------------------------------------------
 !
@@ -615,6 +627,18 @@
 !          accumulate_tavg_field
 !
 !-----------------------------------------------------------------------
+
+   !$OMP PARALLEL DO PRIVATE(iblock,this_block,k,kp1,km1,WTK,WORK1,factor)
+
+   do iblock = 1,nblocks_clinic
+      this_block = get_block(blocks_clinic(iblock),iblock)
+
+      do k = 1,km
+
+         kp1 = k+1
+         km1 = k-1
+         if (k == 1) km1 = 1
+         if (k == km) kp1 = km
 
          if (mix_pass /= 1) then
 

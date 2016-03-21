@@ -538,7 +538,7 @@
          call hdifft_gm(1,HDTK_BUF(:,:,:,1) , TMIX, UMIX, VMIX, tavg_HDIFE_TRACER, &
                                  tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
 
-         start_time = omp_get_wtime()
+         !start_time = omp_get_wtime()
 
          !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)NUM_THREADS(16)
          do kk=2,km
@@ -548,8 +548,8 @@
 
          enddo
 
-         end_time = omp_get_wtime()
-         print *,"time at hdifft_gm is ",end_time - start_time
+         !end_time = omp_get_wtime()
+         !print *,"time at hdifft_gm is ",end_time - start_time
 
       endif
 
@@ -578,7 +578,7 @@
          !print *,"time at submeso_sf is ",end_time - start_time
         endif
 
-        start_time = omp_get_wtime()
+        !start_time = omp_get_wtime()
         if(k==1)then
           !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)num_threads(16)schedule(dynamic,1)
           do kk=1,km 
@@ -586,8 +586,8 @@
                            tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
           enddo 
         endif
-        end_time = omp_get_wtime()
-        print *,"time at submeso_flux is ",end_time - start_time
+        !end_time = omp_get_wtime()
+        !print *,"time at submeso_flux is ",end_time - start_time
         HDTK=HDTK+TDTK(:,:,:,k)
        call timer_stop(timer_submeso, block_id=this_block%local_id)
    endif
