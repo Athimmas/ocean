@@ -230,7 +230,7 @@
 
         !start_time = omp_get_wtime()  
 
-        !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)NUM_THREADS(16) 
+        !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)NUM_THREADS(16) 
         do kk=1,km
 
         call state (kk, kk, TMIX(:,:,kk,1), TMIX(:,:,kk,2),  &
@@ -326,8 +326,8 @@
 
             if ( kk < km ) then
 
-            !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i,temp_ksi,temp_ksip1,temp_ksj,temp_ksjp1,kmask,kmaske,kmaskn,temp_ksim1,kmaskeim1) &
-            !!$OMP PRIVATE(txpim1,txim1,temp_ksjm1,kmasknjm1,typjm1,tyjm1)NUM_THREADS(16)
+            !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(j,i,temp_ksi,temp_ksip1,temp_ksj,temp_ksjp1,kmask,kmaske,kmaskn,temp_ksim1,kmaskeim1) &
+            !$OMP PRIVATE(txpim1,txim1,temp_ksjm1,kmasknjm1,typjm1,tyjm1)NUM_THREADS(16)
             do j=1,ny_block
               do i=1,nx_block
                  KMASK = merge(c1, c0, kk < KMT(i,j,bid))
@@ -497,7 +497,7 @@
 
         enddo   ! end of kk-loop
 
-        !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk,n)num_threads(16)
+        !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk,n)num_threads(60)
         do kk =1,km
          do n = 3,nt
            if ( kk < km ) then

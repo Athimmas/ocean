@@ -538,21 +538,22 @@
          call hdifft_gm(1,HDTK_BUF(:,:,:,1) , TMIX, UMIX, VMIX, tavg_HDIFE_TRACER, &
                                  tavg_HDIFN_TRACER, tavg_HDIFB_TRACER, this_block)
 
-         !start_time = omp_get_wtime()
-
-         !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(kk)NUM_THREADS(16)
          do kk=2,km
-
          call hdifft_gm(kk,HDTK_BUF(:,:,:,kk) , TMIX, UMIX, VMIX,tavg_HDIFE_TRACER, &
-                                 tavg_HDIFN_TRACER, tavg_HDIFB_TRACER,this_block)            
-
+                                 tavg_HDIFN_TRACER, tavg_HDIFB_TRACER,this_block)             
          enddo
-
-         !end_time = omp_get_wtime()
-         !print *,"time at hdifft_gm is ",end_time - start_time
 
       endif
 
+       !end_time = omp_get_wtime() 
+       !print *,"time at hdifft_gm is ",end_time - start_time
+   
+
+      if(my_task == master_task) then
+      open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="unformatted")
+       write(10),HDTK_BUF(:,:,:,k)
+       close(10)
+      endif 
 
       HDTK = HDTK_BUF(:,:,:,k)  
   

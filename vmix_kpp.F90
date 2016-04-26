@@ -3171,7 +3171,7 @@
    enddo
 
    do k=1,km
-     !!$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(ztmp,j,i)NUM_THREADS(16)
+     !$OMP PARALLEL DO DEFAULT(SHARED)PRIVATE(ztmp,j,i)NUM_THREADS(16)
      do j=2,ny_block-1
        do i=2,nx_block-1
 

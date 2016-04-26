@@ -509,6 +509,8 @@
       factor
    type (block) ::        &
       this_block           ! block information for current block
+ 
+   integer, save :: done = 1
 
 !-----------------------------------------------------------------------
 !
@@ -540,6 +542,30 @@
 !  first block loop to update tracers
 !
 !-----------------------------------------------------------------------
+
+   if(my_task == master_task .and. done == 1) then
+
+   print *,"writing"
+
+       open(unit=10,file="/home/aketh/ocn_correctness_data/16OpenMP.txt",status="unknown",position="append",action="write",form="formatted")
+
+   do iblock = 1,nblocks_clinic
+      this_block = get_block(blocks_clinic(iblock),iblock)
+             do j=1,ny_block
+                   do i=1,nx_block
+
+                   write(10,*), TRACER(i,j,45,1,1,iblock),i,j,iblock
+
+                   enddo
+              enddo
+   enddo
+
+   close(10)
+
+   done = 0
+
+   endif
+
 
    !$OMP PARALLEL DO PRIVATE(iblock,this_block,k,kp1,km1,WTK,WORK1,factor)
 
@@ -582,21 +608,11 @@
                                this_block, SMF=SMF(:,:,:,iblock))
          endif
 
-      enddo
-   enddo  
-   !$OMP END PARALLEL DO
 !-----------------------------------------------------------------------
 !
 !        calculate level k tracers at new time
 !
 !-----------------------------------------------------------------------
-
-   !$OMP PARALLEL DO PRIVATE(iblock,this_block,k,kp1,km1,WTK,WORK1,factor)
-
-   do iblock = 1,nblocks_clinic
-      this_block = get_block(blocks_clinic(iblock),iblock)
-
-      do k = 1,km
 
 
          call tracer_update(k, WTK,                             &
@@ -617,9 +633,7 @@
                                PSURF  (:,:    ,curtime,iblock), &
                                this_block)
          
-      enddo
-   enddo
-   !$OMP END PARALLEL DO
+
 
 !-----------------------------------------------------------------------
 !
@@ -627,18 +641,6 @@
 !          accumulate_tavg_field
 !
 !-----------------------------------------------------------------------
-
-   !$OMP PARALLEL DO PRIVATE(iblock,this_block,k,kp1,km1,WTK,WORK1,factor)
-
-   do iblock = 1,nblocks_clinic
-      this_block = get_block(blocks_clinic(iblock),iblock)
-
-      do k = 1,km
-
-         kp1 = k+1
-         km1 = k-1
-         if (k == 1) km1 = 1
-         if (k == km) kp1 = km
 
          if (mix_pass /= 1) then
 
@@ -1715,7 +1717,7 @@
 !-----------------------------------------------------------------------
 
    integer (int_kind) :: &
-      n,kk,              &! dummy tracer index
+      n,                 &! dummy tracer index
       bid                 ! local_block id
 
    real (r8), dimension(nx_block,ny_block,nt) :: &
@@ -1725,9 +1727,6 @@
    real (r8), dimension(nx_block,ny_block) :: &
       WORKSW
 
-  real (r8), dimension(nx_block,ny_block,nt,km),save :: &
-      WORKN_PHI               
- 
 !-----------------------------------------------------------------------
 !
 !  initialize some arrays
@@ -1745,23 +1744,9 @@
 !
 !-----------------------------------------------------------------------
 
-   if(k==1)then
 
-   do kk=1,km
-   call hdifft(kk, WORKN_PHI(:,:,:,kk), TMIX, UMIX, VMIX, this_block)
-   enddo
+   call hdifft(k, WORKN, TMIX, UMIX, VMIX, this_block)
 
-   endif
-
-   WORKN = WORKN_PHI(:,:,:,k)
-
-   !if(my_task==master_task)then
-
-   !   open(unit=10,file="/home/aketh/ocn_correctness_data/changed.txt",status="unknown",position="append",action="write",form="formatted")
-   !   write(10),WORKN
-   !   close(10)
-
-   !endif
 
    FT = FT + WORKN
 

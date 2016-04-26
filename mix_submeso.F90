@@ -434,7 +434,7 @@
      zw_top = c0
      if ( k > 1 )  zw_top = zw(k-1)
 
-    !!$OMP PARALLEL DO SHARED(CONTINUE_INTEGRAL,BX_VERT_AVG,RX,RY,ML_DEPTH)PRIVATE(i,WORK3)NUM_THREADS(16)SCHEDULE(dynamic,16)
+    !$OMP PARALLEL DO SHARED(CONTINUE_INTEGRAL,BX_VERT_AVG,RX,RY,ML_DEPTH)PRIVATE(i,WORK3)num_threads(16)SCHEDULE(dynamic,16)
     do j=1,ny_block
         do i=1,nx_block
 
@@ -541,7 +541,7 @@
 
           
      do k=2,km
-        !!$OMP PARALLEL DO SHARED(WORK3,CONTINUE_INTEGRAL,WORK2,k,bid,dzw,zt,dzwr,RZ_SAVE,ML_DEPTH)PRIVATE(i,j)DEFAULT(NONE)NUM_THREADS(16)
+        !$OMP PARALLEL DO SHARED(WORK3,CONTINUE_INTEGRAL,WORK2,k,bid,dzw,zt,dzwr,RZ_SAVE,ML_DEPTH)PRIVATE(i,j)DEFAULT(NONE)num_threads(16)
         do j=1,ny_block
            do i=1,nx_block
 
@@ -618,8 +618,8 @@
 
      do kk=ktp,kbt
 
-       !!$OMP PARALLEL DO DEFAULT(NONE)PRIVATE(i,j)SHARED(reference_depth,ML_DEPTH,KMT,WORK3,WORK2,WORK1,TIME_SCALE,HLS,SF_SUBM_X,SF_SUBM_Y) &
-       !!$OMP SHARED(BX_VERT_AVG,BY_VERT_AVG,DXT,DYT,max_hor_grid_scale,efficiency_factor,kk,k,bid)NUM_THREADS(16)  
+       !$OMP PARALLEL DO DEFAULT(NONE)PRIVATE(i,j)SHARED(reference_depth,ML_DEPTH,KMT,WORK3,WORK2,WORK1,TIME_SCALE,HLS,SF_SUBM_X,SF_SUBM_Y) &
+       !$OMP SHARED(BX_VERT_AVG,BY_VERT_AVG,DXT,DYT,max_hor_grid_scale,efficiency_factor,kk,k,bid)num_threads(16)  
        do j=1,ny_block
            do i=1,nx_block
 
